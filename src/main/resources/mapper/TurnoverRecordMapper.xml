@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.passenger.financial.mapper.TurnoverRecordMapper">
+  <resultMap id="BaseResultMap" type="com.passenger.financial.entity.TurnoverRecord">
+    <id column="id"  property="id" />
+    <result column="driver_id"  property="driverId" />
+    <result column="driver_name" property="driverName" />
+    <result column="phone"  property="phone" />
+    <result column="organization_Id"  property="organizationId" />
+    <result column="organization_name"  property="organizationName" />
+    <result column="accounting_organization_id"  property="accountingOrganizationId" />
+    <result column="accounting_organization_name"  property="accountingOrganizationName" />
+    <result column="income"  property="income" />
+    <result column="spending"  property="spending" />
+    <result column="profits"  property="profits" />
+    <result column="work_time_type"  property="workTimeType" />
+    <result column="work_time_value"  property="workTimeValue" />
+    <result column="distribution_amount"  property="distributionAmount" />
+    <result column="type"  property="type" />
+    <result column="statistical_type"  property="statisticalType" />
+    <result column="create_time"  property="createTime" />
+    <result column="update_time"  property="updateTime" />
+    <result column="report_date"  property="reportDate" />
+  </resultMap>
+
+  <insert id="insert" parameterType="com.passenger.financial.entity.TurnoverRecord">
+    insert into tb_turnover_record(driver_id,driver_name,phone,organization_Id,organization_name,accounting_organization_id,accounting_organization_name,income,spending,profits,
+                                   work_time_type,work_time_value,distribution_amount,`type`,statistical_type,create_time,update_time,report_date
+            )
+    values(
+           #{driverId},#{driverName},#{phone},#{organizationId},#{organizationName},#{accountingOrganizationId},#{accountingOrganizationName},#{income},#{spending},#{profits},
+           #{workTimeType},#{workTimeValue},#{distributionAmount},#{type},#{statisticalType},#{createTime},#{updateTime},#{reportDate}
+          )
+  </insert>
+
+  <update id="update" parameterType="com.passenger.financial.entity.TurnoverRecord">
+      update tb_turnover_record set
+          income = #{income},
+          spending = #{spending},
+          profits = #{profits},
+          work_time_type=#{workTimeType},
+          work_time_value = #{workTimeValue},
+          distribution_amount = #{distributionAmount},
+          `type` = #{type},
+          statistical_type=#{statisticalType},
+          update_time=#{updateTime}
+      where id = #{id}
+  </update>
+
+
+  <select id="findRecordByDateAndPhone" resultMap="BaseResultMap" parameterType="map">
+    select * from tb_turnover_record where phone = #{phone} and report_date = #{currentDate}
+  </select>
+    <select id="findAllRecordByDateAndAccountId" resultMap="BaseResultMap" parameterType="map">
+        select * from tb_turnover_record where accounting_organization_id = #{accountingId} and report_date = #{currentDate}
+    </select>
+    <select id="findById" resultMap="BaseResultMap" parameterType="int">
+        select * from tb_turnover_record where id = #{id}
+    </select>
+
+
+</mapper>

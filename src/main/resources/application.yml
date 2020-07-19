@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: passenger
+  datasource:
+    url: jdbc:mysql://47.106.172.126:3306/passenger
+    username: root
+    password: Qaz*963.
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  mvc:
+    static-path-pattern: /fileLoad/**
+  resources:
+    static-locations: file:/data/passenger/statistical
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+server:
+  port: 9228
+  servlet:
+    context-path: /passenger
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+statistical:
+  file:
+    path: D:/statistical/
+wechat:
+  info:
+    appId: wxd8dab8fde531ceb9
+    signType: MD5
+    secret: 661b772a3a3a1baeabbc88f78874cb4b
+    tradeType: JSAPI
+    clientIp: 114.119.117.159
+    loginUrl: https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&

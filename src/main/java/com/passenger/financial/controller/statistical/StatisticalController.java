@@ -1,0 +1,110 @@
+package com.passenger.financial.controller.statistical;
+
+
+import com.alibaba.fastjson.JSONObject;
+import com.passenger.financial.common.CommonConstant;
+import com.passenger.financial.common.ResultInfo;
+import com.passenger.financial.service.statistical.StatisticalService;
+import com.passenger.financial.vo.StatisticalInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+
+@RestController
+@CrossOrigin
+@Slf4j
+@RequestMapping("/cms/statistical")
+public class StatisticalController {
+
+    @Resource
+    private StatisticalService statisticalService;
+
+    @RequestMapping("/getStatisticalPreInfo")
+    public ResultInfo getInfo(@RequestBody Map<String,String> params){
+        if (CollectionUtils.isEmpty(params)){
+            return ResultInfo.newEmptyParamsResultInfo();
+        }
+
+        String currentDate = params.get("currentDate");
+        String accountingOrganizationId = params.get("accountingOrganizationId");
+        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(accountingOrganizationId)){
+            return ResultInfo.newEmptyParamsResultInfo();
+        }
+
+        try {
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
+            //统计上班人数，请假人数， 低保人数，值班人数，未上报人数，核算总人数
+            StatisticalInfo statisticalInfo = statisticalService.getStatisticalPreInfo(currentDate,accountingOrganizationId);
+            resultInfo.setData(statisticalInfo);
+            return resultInfo;
+        }catch (Exception e){
+            log.error("activity list happen exception",e);
+            return ResultInfo.newExceptionResultInfo();
+        }
+    }
+
+
+    @RequestMapping("/statistical")
+    public ResultInfo statistical(String currentDate, String accountingOrganizationId, HttpServletRequest request, HttpServletResponse response){
+//        if (CollectionUtils.isEmpty(params)){
+//            return ResultInfo.newEmptyParamsResultInfo();
+//        }
+
+//        String currentDate = params.get("currentDate");
+//        String accountingOrganizationId = params.get("accountingOrganizationId");
+//        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(accountingOrganizationId)){
+//            return ResultInfo.newEmptyParamsResultInfo();
+//        }
+
+        try {
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
+            //统计上班人数，请假人数， 低保人数，值班人数，未上报人数，核算总人数
+            Map<String,String> resultMap = statisticalService.statistical(currentDate,accountingOrganizationId);
+            if (CommonConstant.SUCCESS.equals(resultMap.get("msg"))){
+                String filename = resultMap.get("filePath");
+                String fileRealName = currentDate+"日统计表.xls";
+                OutputStream out = null;
+                try {
+                    response.addHeader("content-disposition", "attachment;filename="
+                            + java.net.URLEncoder.encode(fileRealName, "utf-8"));
+
+                    // 2.下载
+                    out = response.getOutputStream();
+                    // inputStream：读文件，前提是这个文件必须存在，要不就会报错
+                    InputStream is = new FileInputStream(filename);
+
+                    byte[] b = new byte[4096];
+                    int size = is.read(b);
+                    while (size > 0) {
+                        out.write(b, 0, size);
+                        size = is.read(b);
+                    }
+                    out.close();
+                    is.close();
+                } catch (Exception e) {
+                    log.error("download excel happen exception",e);
+                }
+                return resultInfo;
+            }else {
+                return ResultInfo.newFailResultInfo(resultMap.get("msg"));
+            }
+        }catch (Exception e){
+            log.error("activity list happen exception",e);
+            return ResultInfo.newExceptionResultInfo();
+        }
+    }
+}
