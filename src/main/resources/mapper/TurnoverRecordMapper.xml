@@ -21,15 +21,17 @@
     <result column="create_time"  property="createTime" />
     <result column="update_time"  property="updateTime" />
     <result column="report_date"  property="reportDate" />
+      <result column="open_id" property="openId"/>
+      <result column="should_amount" property="shouldAmount"/>
   </resultMap>
 
   <insert id="insert" parameterType="com.passenger.financial.entity.TurnoverRecord">
     insert into tb_turnover_record(driver_id,driver_name,phone,organization_Id,organization_name,accounting_organization_id,accounting_organization_name,income,spending,profits,
-                                   work_time_type,work_time_value,distribution_amount,`type`,statistical_type,create_time,update_time,report_date
+                                   work_time_type,work_time_value,distribution_amount,`type`,statistical_type,create_time,update_time,report_date,open_id
             )
     values(
            #{driverId},#{driverName},#{phone},#{organizationId},#{organizationName},#{accountingOrganizationId},#{accountingOrganizationName},#{income},#{spending},#{profits},
-           #{workTimeType},#{workTimeValue},#{distributionAmount},#{type},#{statisticalType},#{createTime},#{updateTime},#{reportDate}
+           #{workTimeType},#{workTimeValue},#{distributionAmount},#{type},#{statisticalType},#{createTime},#{updateTime},#{reportDate},#{openId}
           )
   </insert>
 
@@ -41,6 +43,7 @@
           work_time_type=#{workTimeType},
           work_time_value = #{workTimeValue},
           distribution_amount = #{distributionAmount},
+          should_amount = #{shouldAmount},
           `type` = #{type},
           statistical_type=#{statisticalType},
           update_time=#{updateTime}

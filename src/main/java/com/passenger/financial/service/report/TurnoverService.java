@@ -1,14 +1,17 @@
 package com.passenger.financial.service.report;
 
 import com.passenger.financial.common.CommonConstant;
+import com.passenger.financial.entity.ApiUser;
 import com.passenger.financial.entity.Driver;
 import com.passenger.financial.entity.Organization;
 import com.passenger.financial.entity.TurnoverRecord;
 import com.passenger.financial.mapper.DriverMapper;
 import com.passenger.financial.mapper.OrganizationMapper;
 import com.passenger.financial.mapper.TurnoverRecordMapper;
+import com.passenger.financial.service.apiUser.ApiUserService;
 import com.passenger.financial.utils.CalculateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,6 +33,9 @@ public class TurnoverService {
     @Resource
     private TurnoverRecordMapper turnoverRecordMapper;
 
+    @Resource
+    private ApiUserService apiUserService;
+
     public TurnoverRecord findTurnoverRecord(String currentDate, String phone) {
         return turnoverRecordMapper.findRecordByDateAndPhone(currentDate,phone);
     }
@@ -47,12 +53,17 @@ public class TurnoverService {
         }catch (Exception e){
             return "油费输入，请重新输入";
         }
+        if (StringUtils.isEmpty(record.getOpenId())){
+            return "司机唯一表示错误，请联系管理员";
+        }
+        ApiUser apiUser = apiUserService.findApiUserByOpenId(record.getOpenId());
+        if (apiUser == null || StringUtils.isEmpty(apiUser.getPhoneNum())){
+            return "当前用户不存在或未绑定司机信息，请联系管理员";
+        }
         return CommonConstant.SUCCESS;
     }
 
-    public String initRecord(TurnoverRecord record) {
-        int driverId = record.getDriverId();
-        Driver driver = driverMapper.findById(driverId);
+    public String initRecord(TurnoverRecord record,Driver driver) {
 
         Organization organization = organizationMapper.findById(driver.getOrganizationId());
         record.setDriverName(driver.getName());

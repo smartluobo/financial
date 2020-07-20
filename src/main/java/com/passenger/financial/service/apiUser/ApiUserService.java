@@ -31,7 +31,7 @@ public class ApiUserService {
     }
 
     public void updateApiUserInfo (ApiUser record) {
-        apiUserMapper.updateOpenIdSelective(record);
+        apiUserMapper.updateByPrimaryKey(record);
     }
 
 }

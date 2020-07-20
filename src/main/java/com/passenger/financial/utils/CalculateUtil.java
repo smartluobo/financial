@@ -26,4 +26,9 @@ public class CalculateUtil {
     public static void main(String[] args) {
         System.out.println(div("960.35", "3.5"));
     }
+
+    public static String multiply(String number1, String number2) {
+        BigDecimal multiply = new BigDecimal(number1).multiply(new BigDecimal(number2));
+        return String.valueOf(multiply.setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
 }

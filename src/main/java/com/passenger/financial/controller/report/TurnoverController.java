@@ -2,8 +2,10 @@ package com.passenger.financial.controller.report;
 
 import com.passenger.financial.common.CommonConstant;
 import com.passenger.financial.common.ResultInfo;
+import com.passenger.financial.entity.ApiUser;
 import com.passenger.financial.entity.Driver;
 import com.passenger.financial.entity.TurnoverRecord;
+import com.passenger.financial.service.apiUser.ApiUserService;
 import com.passenger.financial.service.driver.DriverService;
 import com.passenger.financial.service.report.TurnoverService;
 import com.passenger.financial.vo.TurnoverVo;
@@ -31,6 +33,9 @@ public class TurnoverController {
     @Resource
     private DriverService driverService;
 
+    @Resource
+    private ApiUserService apiUserService;
+
     @RequestMapping("/getInfo")
     public ResultInfo getInfo(@RequestBody Map<String,String> params){
         if (CollectionUtils.isEmpty(params)){
@@ -38,15 +43,23 @@ public class TurnoverController {
         }
 
         String currentDate = params.get("currentDate");
-        String phone = params.get("phone");
-        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(phone)){
+        String openId = params.get("openId");
+        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(openId)){
             return ResultInfo.newEmptyParamsResultInfo();
         }
 
         try {
+            ApiUser apiUserByOpenId = apiUserService.findApiUserByOpenId(openId);
+            if (apiUserByOpenId == null){
+                return ResultInfo.newFailResultInfo("用户不存在");
+            }
+            String phone = apiUserByOpenId.getPhoneNum();
+            if (StringUtils.isEmpty(phone)){
+                return ResultInfo.newFailResultInfo("当前微信号没有绑定司机信息，请联系管理员！");
+            }
             Driver driver = driverService.findDriverByPhone(phone);
             if (driver == null){
-                return ResultInfo.newFailResultInfo("司机信息不存在，请核对电话号码");
+                return ResultInfo.newFailResultInfo("司机信息不存在，请联系管理员");
             }
 
             TurnoverRecord turnoverRecord = turnoverService.findTurnoverRecord(currentDate, phone);
@@ -75,9 +88,14 @@ public class TurnoverController {
                 return ResultInfo.newFailResultInfo(flag);
             }
 
+            String phone = record.getPhone();
+            Driver driver = driverService.findDriverByPhone(phone);
+            if (driver == null){
+                return ResultInfo.newFailResultInfo("司机信息为空，请联系管理员");
+            }
             if (record.getId() == 0){
                 record.setCreateTime(new Date());
-                String initFlag = turnoverService.initRecord(record);
+                String initFlag = turnoverService.initRecord(record,driver);
                 if (!CommonConstant.SUCCESS.equals(initFlag)){
                     return ResultInfo.newFailResultInfo(initFlag);
                 }

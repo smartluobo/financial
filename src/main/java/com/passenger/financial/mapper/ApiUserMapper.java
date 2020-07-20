@@ -11,8 +11,6 @@ public interface ApiUserMapper {
 
     ApiUser selectByPrimaryKey(Integer id);
 
-    int updateOpenIdSelective(ApiUser record);
-
     int updateByPrimaryKey(ApiUser record);
 
     ApiUser selectByOpenId(String openId);

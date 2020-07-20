@@ -16,9 +16,7 @@ public class ApiUser {
 
     private String openId;
 
-    private String wechatPhoneNum;
-
-    private String userBindPhoneNum;
+    private String phoneNum;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")

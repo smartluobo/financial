@@ -70,9 +70,14 @@ public class TurnoverRecord {
     private String accountingOrganizationName;
 
     /**
-     * 分配金额
+     * 日均分配金额
      */
     private String distributionAmount = "0";
+
+    /**
+     * 应该收入金额
+     */
+    private String shouldAmount = "0";
 
     /**
      * 类型 1-上班 2-值班 3-请假 4-低保
@@ -93,4 +98,10 @@ public class TurnoverRecord {
     private Date updateTime;
 
     private String reportDate;
+
+    private String openId;
+
+    private String intoAmount;
+
+    private String outAmount;
 }

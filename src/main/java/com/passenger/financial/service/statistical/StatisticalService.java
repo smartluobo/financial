@@ -184,6 +184,10 @@ public class StatisticalService {
         Map<Integer,List<TurnoverRecord>> recordMap = new HashMap<>();
 
         for (TurnoverRecord record : records) {
+            //更新日均分配和应收金额
+            record.setDistributionAmount(statisticalPreInfo.getDistributionAmount());
+            record.setShouldAmount(CalculateUtil.multiply(record.getDistributionAmount(),record.getWorkTimeValue()));
+            turnoverRecordMapper.update(record);
             List<TurnoverRecord> organizationRecords = recordMap.get(record.getOrganizationId());
             if (CollectionUtils.isEmpty(organizationRecords)){
                 organizationRecords = new ArrayList<>();

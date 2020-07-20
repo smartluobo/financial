@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -72,6 +73,7 @@ public class ApiLoginController {
             }
             apiuser.setNickName(nickName);
             apiuser.setUserHeadImage(userHeadImage);
+            apiuser.setUpdateTime(new Date());
             apiUserService.updateApiUserInfo(apiuser);
             return resultInfo;
         }catch (Exception e){
