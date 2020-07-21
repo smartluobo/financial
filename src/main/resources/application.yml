@@ -2,9 +2,9 @@ spring:
   application:
     name: passenger
   datasource:
-    url: jdbc:mysql://47.106.172.126:3306/passenger
+    url: jdbc:mysql://localhost:3306/passenger
     username: root
-    password: Qaz*963.
+    password: 111111
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
   mvc:
