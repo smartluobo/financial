@@ -18,4 +18,6 @@ public interface TurnoverRecordMapper {
     List<TurnoverRecord> findAllRecordByDateAndAccountId(@Param("currentDate") String currentDate, @Param("accountingId") Integer accountingId);
 
     TurnoverRecord findById(int id);
+
+    void cancelStatisticalUpdate(@Param("reportDate") String statisticalDate, @Param("organizationId") int organizationId);
 }

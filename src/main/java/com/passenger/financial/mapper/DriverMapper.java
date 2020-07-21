@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface DriverMapper {
@@ -15,4 +16,8 @@ public interface DriverMapper {
     int findByAccountIdCount(@Param("accountingId") Integer accountingId);
 
     List<Driver> findNoCommitInfo(@Param("accountingId") Integer accountingId, @Param("currentDate") String currentDate);
+
+    List<Driver> findDriverByCondition(Map<String, String> params);
+
+    void insert(Driver driver);
 }

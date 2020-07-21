@@ -54,8 +54,12 @@
       where id = #{id}
   </update>
 
+    <update id="cancelStatisticalUpdate" parameterType="map">
+        update tb_turnover_record set distribution_amount = 0 where  accounting_organization_id = #{organizationId} and report_date = #{reportDate}
+    </update>
 
-  <select id="findRecordByDateAndPhone" resultMap="BaseResultMap" parameterType="map">
+
+    <select id="findRecordByDateAndPhone" resultMap="BaseResultMap" parameterType="map">
     select * from tb_turnover_record where phone = #{phone} and report_date = #{currentDate}
   </select>
     <select id="findAllRecordByDateAndAccountId" resultMap="BaseResultMap" parameterType="map">

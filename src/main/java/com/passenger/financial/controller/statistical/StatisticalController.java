@@ -1,14 +1,12 @@
 package com.passenger.financial.controller.statistical;
 
 
-import com.alibaba.fastjson.JSONObject;
 import com.passenger.financial.common.CommonConstant;
 import com.passenger.financial.common.ResultInfo;
+import com.passenger.financial.entity.StatisticalInfo;
 import com.passenger.financial.service.statistical.StatisticalService;
-import com.passenger.financial.vo.StatisticalInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +17,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
@@ -102,6 +99,23 @@ public class StatisticalController {
             }else {
                 return ResultInfo.newFailResultInfo(resultMap.get("msg"));
             }
+        }catch (Exception e){
+            log.error("activity list happen exception",e);
+            return ResultInfo.newExceptionResultInfo();
+        }
+    }
+
+
+    @RequestMapping("/cancel")
+    public ResultInfo cancel(String currentDate, String accountingOrganizationId){
+        try {
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
+            StatisticalInfo statisticalRecordByDate = statisticalService.findStatisticalRecordByDate(currentDate, Integer.valueOf(accountingOrganizationId));
+            if (statisticalRecordByDate == null){
+                return ResultInfo.newFailResultInfo("当日无统计记录，取消失败");
+            }
+            statisticalService.cancel(statisticalRecordByDate);
+            return resultInfo;
         }catch (Exception e){
             log.error("activity list happen exception",e);
             return ResultInfo.newExceptionResultInfo();

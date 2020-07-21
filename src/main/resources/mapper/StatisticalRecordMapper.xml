@@ -35,6 +35,14 @@
                 #{organizationId},#{organizationName},#{distributionAmount},#{statisticalDate},#{createTime})
     </insert>
 
+    <delete id="deleteById" parameterType="int">
+        delete from tb_statistical_record where id = #{id}
+    </delete>
+
+    <delete id="deleteDetailByParentId" parameterType="int">
+        delete from tb_statistical_record_detail where parent_id = #{id}
+    </delete>
+
     <select id="findStatisticalRecordByDate" resultMap="BaseResultMap" parameterType="map">
       select * from  tb_statistical_record where statistical_date = #{statisticalDate} and organization_id = #{accountingOrganizationId}
     </select>

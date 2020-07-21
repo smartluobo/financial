@@ -350,7 +350,7 @@ public class ExcelService {
         recordsMap.put(2,records);
         recordsMap.put(3,records1);
         HSSFWorkbook sheets = excelService.generateExcel(statisticalInfo, recordsMap);
-        excelService.writeFile(sheets,"D:/my_code/financial/123.xls");
+        excelService.writeFile(sheets,"D:/123.xls");
 
     }
 

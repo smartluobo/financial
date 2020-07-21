@@ -11,4 +11,8 @@ public interface StatisticalRecordMapper {
     void insertDetailStatistical(StatisticalInfo directOrganizationInfo);
 
     StatisticalInfo findStatisticalRecordByDate(@Param("statisticalDate") String statisticalDate, @Param("accountingOrganizationId") int accountingOrganizationId);
+
+    void deleteById(int id);
+
+    void deleteDetailByParentId(int id);
 }

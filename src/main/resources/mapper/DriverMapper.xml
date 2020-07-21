@@ -14,6 +14,11 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <insert id="insert" parameterType="com.passenger.financial.entity.Driver">
+        insert into tb_driver (phone,`name`,organization_id,organization_name,accounting_organization_id,accounting_organization_name,create_time,update_time)
+        values (#{phone},#{name},#{organizationId},#{organizationName},#{accountingOrganizationId},#{accountingOrganizationName},#{createTime},#{updateTime})
+    </insert>
+
     <select id="findDriverByPhone" resultMap="BaseResultMap" parameterType="string">
         select *
         from tb_driver
@@ -36,6 +41,18 @@
                   select driver_id from tb_turnover_record
                   where  report_date = #{currentDate}
              )
+    </select>
+
+    <select id="findDriverByCondition" resultMap="BaseResultMap" parameterType="map">
+        select * from tb_driver
+        <where>
+            <if test="organizationId != null">
+                organization_id = #{organizationId}
+            </if>
+            <if test="accountingOrganizationId != null">
+                and accounting_organization_id = #{accountingOrganizationId}
+            </if>
+        </where>
     </select>
 
 </mapper>

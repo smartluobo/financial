@@ -16,6 +16,9 @@ public class ApiUser {
 
     private String openId;
 
+    /**
+     * 电话号码
+     */
     private String phoneNum;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -27,5 +30,29 @@ public class ApiUser {
     private Date updateTime;
 
     private String userHeadImage;
+
+    /**
+     * 司机姓名
+     */
+    private String driverName;
+
+    /**
+     * 直接组织id
+     */
+    private String organizationId;
+
+    /**
+     * 直接组织名称
+     */
+    private String organizationName;
+
+   /**
+     * 核算组织id
+     */
+    private int accountingOrganizationId;
+    /**
+     * 核算组织名称
+     */
+    private String accountingOrganizationName;
 
 }

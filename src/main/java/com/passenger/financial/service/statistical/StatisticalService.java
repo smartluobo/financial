@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.*;
 
 @Service
@@ -233,5 +234,19 @@ public class StatisticalService {
 
     public StatisticalInfo findStatisticalRecordByDate(String statisticalDate,int accountingOrganizationId) {
         return statisticalRecordMapper.findStatisticalRecordByDate(statisticalDate,accountingOrganizationId);
+    }
+
+    public void cancel(StatisticalInfo statisticalRecord) {
+        //删除统计记录
+        statisticalRecordMapper.deleteById(statisticalRecord.getId());
+        //删除核算组织下明细记录
+        statisticalRecordMapper.deleteDetailByParentId(statisticalRecord.getId());
+        //清空当日分配金额
+        turnoverRecordMapper.cancelStatisticalUpdate(statisticalRecord.getStatisticalDate(),statisticalRecord.getOrganizationId());
+        //删除统计文件
+        File file = new File(statisticalRecord.getFilePath());
+        if (file.exists()){
+            file.delete();
+        }
     }
 }
