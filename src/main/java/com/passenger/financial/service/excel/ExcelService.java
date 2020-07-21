@@ -1,7 +1,7 @@
 package com.passenger.financial.service.excel;
 
+import com.passenger.financial.entity.StatisticalInfo;
 import com.passenger.financial.entity.TurnoverRecord;
-import com.passenger.financial.vo.StatisticalInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;

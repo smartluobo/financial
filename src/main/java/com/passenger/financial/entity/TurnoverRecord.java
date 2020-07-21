@@ -97,11 +97,23 @@ public class TurnoverRecord {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
+    /**
+     * 上报日期
+     */
     private String reportDate;
 
+    /**
+     * 微信open_id
+     */
     private String openId;
 
+    /**
+     * 每日进金额 实收金额小于日营收金额 该值大于0
+     */
     private String intoAmount;
 
+    /**
+     *  每日补金额 实收金额大于营收金额该值大于0
+     */
     private String outAmount;
 }

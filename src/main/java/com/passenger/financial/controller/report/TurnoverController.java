@@ -4,10 +4,12 @@ import com.passenger.financial.common.CommonConstant;
 import com.passenger.financial.common.ResultInfo;
 import com.passenger.financial.entity.ApiUser;
 import com.passenger.financial.entity.Driver;
+import com.passenger.financial.entity.StatisticalInfo;
 import com.passenger.financial.entity.TurnoverRecord;
 import com.passenger.financial.service.apiUser.ApiUserService;
 import com.passenger.financial.service.driver.DriverService;
 import com.passenger.financial.service.report.TurnoverService;
+import com.passenger.financial.service.statistical.StatisticalService;
 import com.passenger.financial.vo.TurnoverVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +37,9 @@ public class TurnoverController {
 
     @Resource
     private ApiUserService apiUserService;
+
+    @Resource
+    private StatisticalService statisticalService;
 
     @RequestMapping("/getInfo")
     public ResultInfo getInfo(@RequestBody Map<String,String> params){
@@ -81,6 +86,11 @@ public class TurnoverController {
     public ResultInfo report(@RequestBody TurnoverRecord record){
         if (record == null){
             return ResultInfo.newEmptyParamsResultInfo();
+        }
+        //查询当日是否有统计记录，如果有统计记录不允许再提交数据
+        StatisticalInfo statisticalInfo = statisticalService.findStatisticalRecordByDate(record.getReportDate(),record.getAccountingOrganizationId());
+        if (statisticalInfo != null){
+            return ResultInfo.newFailResultInfo("当日统计记录已生成，请联系管理员处理");
         }
         try {
             String flag = turnoverService.checkRecord(record);

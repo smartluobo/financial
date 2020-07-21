@@ -3,23 +3,21 @@ package com.passenger.financial.service.statistical;
 import com.passenger.financial.common.CommonConstant;
 import com.passenger.financial.entity.Driver;
 import com.passenger.financial.entity.Organization;
+import com.passenger.financial.entity.StatisticalInfo;
 import com.passenger.financial.entity.TurnoverRecord;
 import com.passenger.financial.mapper.DriverMapper;
 import com.passenger.financial.mapper.OrganizationMapper;
+import com.passenger.financial.mapper.StatisticalRecordMapper;
 import com.passenger.financial.mapper.TurnoverRecordMapper;
 import com.passenger.financial.service.excel.ExcelService;
 import com.passenger.financial.utils.CalculateUtil;
-import com.passenger.financial.vo.StatisticalInfo;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StatisticalService {
@@ -35,6 +33,9 @@ public class StatisticalService {
 
     @Resource
     private ExcelService excelService;
+
+    @Resource
+    private StatisticalRecordMapper statisticalRecordMapper;
 
     @Value("${statistical.file.path}")
     private String filePath;
@@ -178,6 +179,8 @@ public class StatisticalService {
         }
         StatisticalInfo statisticalPreInfo = getStatisticalPreInfo(currentDate, accountingOrganizationId);
 
+        statisticalPreInfo.setStatisticalDate(currentDate);
+
         //查询当前核算组织下当日司机提交的营收记录
         List<TurnoverRecord> records = turnoverRecordMapper.findAllRecordByDateAndAccountId(currentDate,accountingId);
 
@@ -187,6 +190,13 @@ public class StatisticalService {
             //更新日均分配和应收金额
             record.setDistributionAmount(statisticalPreInfo.getDistributionAmount());
             record.setShouldAmount(CalculateUtil.multiply(record.getDistributionAmount(),record.getWorkTimeValue()));
+            if (Double.parseDouble(record.getProfits()) > Double.parseDouble(record.getShouldAmount())){
+                //实际收入大于应收
+                record.setOutAmount(CalculateUtil.sub(record.getProfits(),record.getShouldAmount()));
+            }else{
+                //实际收入小于应收
+                record.setIntoAmount(CalculateUtil.sub(record.getShouldAmount(),record.getProfits()));
+            }
             turnoverRecordMapper.update(record);
             List<TurnoverRecord> organizationRecords = recordMap.get(record.getOrganizationId());
             if (CollectionUtils.isEmpty(organizationRecords)){
@@ -197,7 +207,21 @@ public class StatisticalService {
         }
         buildExcel(statisticalPreInfo, recordMap, currentDate);
         resultMap.put("msg",CommonConstant.SUCCESS);
-        resultMap.put("filePath",filePath + currentDate + "日统计表.xls");
+        String statisticalFilePath = this.filePath + currentDate + "日统计表.xls";
+        resultMap.put("statisticalFilePath", statisticalFilePath);
+        //生成统计信息并插入数据表
+        statisticalPreInfo.setFilePath(statisticalFilePath);
+        statisticalPreInfo.setCreateTime(new Date());
+
+        statisticalRecordMapper.insertStatistical(statisticalPreInfo);
+        if ( !CollectionUtils.isEmpty(statisticalPreInfo.getDirectOrganizationInfos())){
+            //当前核算组织有其余核算组织，将其余核算组织数据插入明细表
+            for (StatisticalInfo directOrganizationInfo : statisticalPreInfo.getDirectOrganizationInfos()) {
+                directOrganizationInfo.setParentId(statisticalPreInfo.getId());
+                directOrganizationInfo.setCreateTime(new Date());
+                statisticalRecordMapper.insertDetailStatistical(directOrganizationInfo);
+            }
+        }
         return resultMap;
     }
 
@@ -205,5 +229,9 @@ public class StatisticalService {
         HSSFWorkbook hssfWorkbook = excelService.generateExcel(statisticalPreInfo, recordMap);
         String fileName = filePath + currentDate + "日统计表.xls";
         excelService.writeFile(hssfWorkbook,fileName);
+    }
+
+    public StatisticalInfo findStatisticalRecordByDate(String statisticalDate,int accountingOrganizationId) {
+        return statisticalRecordMapper.findStatisticalRecordByDate(statisticalDate,accountingOrganizationId);
     }
 }

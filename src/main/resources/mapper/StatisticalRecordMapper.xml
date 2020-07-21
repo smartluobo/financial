@@ -2,21 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.passenger.financial.mapper.StatisticalRecordMapper">
 
-    <resultMap id="BaseResultMap" type="com.passenger.financial.entity.StatisticalRecord">
+    <resultMap id="BaseResultMap" type="com.passenger.financial.entity.StatisticalInfo">
         <id column="id" property="id"/>
-        <result column="operation_vehicle_count" property="operationVehicleCount"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="total_count" property="totalCount"/>
         <result column="leave_count" property="leaveCount"/>
-        <result column="total_vehicle_count" property="totalVehicleCount"/>
-        <result column="statistical_date" property="statisticalDate"/>
+        <result column="duty_count" property="dutyCount"/>
+        <result column="low_count" property="lowCount"/>
+        <result column="operation_count" property="operationCount"/>
         <result column="total_income" property="totalIncome"/>
         <result column="total_spending" property="totalSpending"/>
         <result column="total_profits" property="totalProfits"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="organization_name" property="organizationName"/>
         <result column="distribution_amount" property="distributionAmount"/>
-        <result column="status" property="status"/>
+        <result column="statistical_date" property="statisticalDate"/>
+        <result column="file_path" property="filePath"/>
         <result column="create_time" property="createTime"/>
-        <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <insert id="insertStatistical" parameterType="com.passenger.financial.entity.StatisticalInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_statistical_record (total_count,leave_count,duty_count,low_count,operation_count,total_income,total_spending,total_profits,
+                                           organization_id,organization_name,distribution_amount,statistical_date,file_path,create_time)
+        values (#{totalCount},#{leaveCount},#{dutyCount},#{lowCount},#{operationCount},#{totalIncome},#{totalSpending},#{totalProfits},
+                #{organizationId},#{organizationName},#{distributionAmount},#{statisticalDate},#{filePath},#{createTime})
+    </insert>
+
+    <insert id="insertDetailStatistical" parameterType="com.passenger.financial.entity.StatisticalInfo" >
+        insert into tb_statistical_record_detail (parent_id,total_count,leave_count,duty_count,low_count,operation_count,total_income,total_spending,total_profits,
+                                           organization_id,organization_name,distribution_amount,statistical_date,create_time)
+        values (#{parentId},#{totalCount},#{leaveCount},#{dutyCount},#{lowCount},#{operationCount},#{totalIncome},#{totalSpending},#{totalProfits},
+                #{organizationId},#{organizationName},#{distributionAmount},#{statisticalDate},#{createTime})
+    </insert>
+
+    <select id="findStatisticalRecordByDate" resultMap="BaseResultMap" parameterType="map">
+      select * from  tb_statistical_record where statistical_date = #{statisticalDate} and organization_id = #{accountingOrganizationId}
+    </select>
 
 
 </mapper>

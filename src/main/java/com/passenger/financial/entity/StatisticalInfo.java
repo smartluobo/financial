@@ -1,12 +1,19 @@
-package com.passenger.financial.vo;
+package com.passenger.financial.entity;
 
-import com.passenger.financial.entity.Driver;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
 public class StatisticalInfo {
+
+    /**
+     * 父级核算机构统计记录id
+     */
+    private int parentId;
+
+    private int id;
 
     /**
      * 总司机数
@@ -63,8 +70,14 @@ public class StatisticalInfo {
      */
     private List<StatisticalInfo> directOrganizationInfos;
 
+    /**
+     * 组织id
+     */
     private int organizationId;
 
+    /**
+     * 组织名称
+     */
     private String organizationName;
 
     /**
@@ -72,5 +85,18 @@ public class StatisticalInfo {
      */
     private String distributionAmount = "0";
 
+    /**
+     * 统计日期
+     */
     private String statisticalDate;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 统计文件路径
+     */
+    private String filePath;
 }

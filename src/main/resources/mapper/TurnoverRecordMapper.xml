@@ -23,6 +23,8 @@
     <result column="report_date"  property="reportDate" />
       <result column="open_id" property="openId"/>
       <result column="should_amount" property="shouldAmount"/>
+      <result column="into_amount" property="intoAmount"/>
+      <result column="out_amount" property="outAmount"/>
   </resultMap>
 
   <insert id="insert" parameterType="com.passenger.financial.entity.TurnoverRecord">
@@ -44,6 +46,8 @@
           work_time_value = #{workTimeValue},
           distribution_amount = #{distributionAmount},
           should_amount = #{shouldAmount},
+          into_amount = #{intoAmount},
+          out_amount = #{outAmount},
           `type` = #{type},
           statistical_type=#{statisticalType},
           update_time=#{updateTime}
