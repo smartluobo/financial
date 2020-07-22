@@ -20,4 +20,6 @@ public interface DriverMapper {
     List<Driver> findDriverByCondition(Map<String, String> params);
 
     void insert(Driver driver);
+
+    List<Integer> findIdByAccountId(int organizationId);
 }

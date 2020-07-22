@@ -20,4 +20,6 @@ public interface TurnoverRecordMapper {
     TurnoverRecord findById(int id);
 
     void cancelStatisticalUpdate(@Param("reportDate") String statisticalDate, @Param("organizationId") int organizationId);
+
+    List<TurnoverRecord> findRecordByDriverId(Integer driverId);
 }

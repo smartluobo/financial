@@ -55,4 +55,8 @@
         </where>
     </select>
 
+    <select id="findIdByAccountId" resultType="java.lang.Integer" parameterType="int">
+        select id from tb_driver where accounting_organization_id = #{accountingOrganizationId}
+    </select>
+
 </mapper>
