@@ -14,17 +14,18 @@ public class Driver {
      * 主键id
      */
     private int id;
-    /**
-     * 司机电话号码
-     */
 
-    @ExcelColumn(value = "电话号码", col = 1)
-    private String phone;
     /**
      * 司机姓名
      */
-    @ExcelColumn(value = "司机姓名", col = 2)
+    @ExcelColumn(value = "姓名", col = 1)
     private String name;
+
+    /**
+     * 司机电话号码
+     */
+    @ExcelColumn(value = "电话号码", col = 2)
+    private String phone;
     /**
      * 直属组织id
      */

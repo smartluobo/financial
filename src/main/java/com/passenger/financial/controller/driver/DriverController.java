@@ -31,7 +31,6 @@ public class DriverController {
         }
         try {
             ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
-            //统计上班人数，请假人数， 低保人数，值班人数，未上报人数，核算总人数
             List<Driver> drivers = driverService.findDriverByCondition(params);
             resultInfo.setData(drivers);
             return resultInfo;

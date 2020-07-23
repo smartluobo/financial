@@ -79,8 +79,17 @@ public class RangeExcelService {
                 List<TurnoverRecord> records = turnoverRecordMapper.findRecordByDriverId(driverId);
                 if (!CollectionUtils.isEmpty(records)){
                     HSSFRow bodyRow = sheet.createRow(rowIndex++);
+                    bodyRow.createCell(0).setCellValue(records.get(0).getDriverName());
+                    int cellIndex = 1;
+                    //分配总额
+                    String distributionTotal = "0";
+                    //上班天数 记录
+                    //个人收入 金额
+                    //个人应收 金额
+                    //进 金额
+                    //补 金额
                     for (TurnoverRecord record : records) {
-
+                        bodyRow.createCell(cellIndex++).setCellValue(record.getProfits());
                     }
                 }
             }
