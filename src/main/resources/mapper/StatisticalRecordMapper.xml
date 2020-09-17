@@ -47,5 +47,13 @@
       select * from  tb_statistical_record where statistical_date = #{statisticalDate} and organization_id = #{accountingOrganizationId}
     </select>
 
+    <select id="findStatisticalRecordByRange" resultMap="BaseResultMap" parameterType="map">
+      select * from tb_statistical_record where <![CDATA[statistical_date >= #{startDate} and statistical_date <= #{endDate} and  organization_id = #{organizationId}]]> order by statistical_date
+    </select>
+
+    <select id="findStatisticalDetailByParentId" resultMap="BaseResultMap" parameterType="int">
+        select * from tb_statistical_record_detail where parent_id = #{id}
+    </select>
+
 
 </mapper>

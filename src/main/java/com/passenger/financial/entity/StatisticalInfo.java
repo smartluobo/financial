@@ -99,4 +99,8 @@ public class StatisticalInfo {
      * 统计文件路径
      */
     private String filePath;
+
+    private int source;
+
+    private String downloadUrl;
 }

@@ -1,23 +1,24 @@
 package com.passenger.financial.service.statistical;
 
 import com.passenger.financial.common.CommonConstant;
-import com.passenger.financial.entity.Driver;
-import com.passenger.financial.entity.Organization;
-import com.passenger.financial.entity.StatisticalInfo;
-import com.passenger.financial.entity.TurnoverRecord;
+import com.passenger.financial.entity.*;
 import com.passenger.financial.mapper.DriverMapper;
 import com.passenger.financial.mapper.OrganizationMapper;
 import com.passenger.financial.mapper.StatisticalRecordMapper;
 import com.passenger.financial.mapper.TurnoverRecordMapper;
 import com.passenger.financial.service.excel.ExcelService;
+import com.passenger.financial.service.excel.RangeExcelService;
 import com.passenger.financial.utils.CalculateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.*;
 
 @Service
@@ -37,6 +38,9 @@ public class StatisticalService {
 
     @Resource
     private StatisticalRecordMapper statisticalRecordMapper;
+
+    @Resource
+    private RangeExcelService rangeExcelService;
 
     @Value("${statistical.file.path}")
     private String filePath;
@@ -171,6 +175,11 @@ public class StatisticalService {
 
     public Map<String,String> statistical(String currentDate, String accountingOrganizationId) {
         Map<String,String> resultMap = new HashMap<>();
+        StatisticalInfo statisticalInfo = findStatisticalRecordByDate(currentDate, Integer.valueOf(accountingOrganizationId));
+        if (statisticalInfo != null){
+            resultMap.put("msg","当日已存在统计记录，请先取消统计");
+            return resultMap;
+        }
         int accountingId = Integer.valueOf(accountingOrganizationId);
         //查询未提交的司机信息
         List<Driver> noCommitDrivers = driverMapper.findNoCommitInfo(accountingId,currentDate);
@@ -248,5 +257,26 @@ public class StatisticalService {
         if (file.exists()){
             file.delete();
         }
+    }
+
+    public void rangeStatistical(String startDate, String endDate, int accountingOrganizationId) throws Exception{
+        rangeExcelService.generateRangeExcel(startDate,endDate,accountingOrganizationId);
+
+    }
+
+    public String download(String currentDate, String accountingOrganizationId) {
+        StatisticalInfo statisticalInfo = statisticalRecordMapper.findStatisticalRecordByDate(currentDate, Integer.valueOf(accountingOrganizationId));
+        if (statisticalInfo == null){
+            return null;
+        }
+        return statisticalInfo.getFilePath();
+//        File file = new File(filePath);
+//        BufferedInputStream bf = new BufferedInputStream(new FileInputStream(file));
+//        POIFSFileSystem fs = new POIFSFileSystem(bf);
+//        return new HSSFWorkbook(fs);
+    }
+
+    public List<StatisticalInfo> findStatisticalDetailByParentId(int parentId) {
+        return statisticalRecordMapper.findStatisticalDetailByParentId(parentId);
     }
 }

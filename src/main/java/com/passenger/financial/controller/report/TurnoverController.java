@@ -26,7 +26,7 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @Slf4j
-@RequestMapping("/cms/turnover")
+@RequestMapping("/api/turnover")
 public class TurnoverController {
 
     @Resource
@@ -58,16 +58,16 @@ public class TurnoverController {
             if (apiUserByOpenId == null){
                 return ResultInfo.newFailResultInfo("用户不存在");
             }
-            String phone = apiUserByOpenId.getPhoneNum();
-            if (StringUtils.isEmpty(phone)){
+            int driverId = apiUserByOpenId.getDriverId();
+            if (driverId == 0){
                 return ResultInfo.newFailResultInfo("当前微信号没有绑定司机信息，请联系管理员！");
             }
-            Driver driver = driverService.findDriverByPhone(phone);
+            Driver driver = driverService.findDriverById(driverId);
             if (driver == null){
                 return ResultInfo.newFailResultInfo("司机信息不存在，请联系管理员");
             }
 
-            TurnoverRecord turnoverRecord = turnoverService.findTurnoverRecord(currentDate, phone);
+            TurnoverRecord turnoverRecord = turnoverService.findTurnoverRecord(currentDate, driverId);
 
             TurnoverVo vo = new TurnoverVo();
             vo.setDriver(driver);
@@ -87,6 +87,7 @@ public class TurnoverController {
         if (record == null){
             return ResultInfo.newEmptyParamsResultInfo();
         }
+        log.info("record : {}",record);
         //查询当日是否有统计记录，如果有统计记录不允许再提交数据
         StatisticalInfo statisticalInfo = statisticalService.findStatisticalRecordByDate(record.getReportDate(),record.getAccountingOrganizationId());
         if (statisticalInfo != null){
@@ -98,12 +99,24 @@ public class TurnoverController {
                 return ResultInfo.newFailResultInfo(flag);
             }
 
-            String phone = record.getPhone();
-            Driver driver = driverService.findDriverByPhone(phone);
-            if (driver == null){
-                return ResultInfo.newFailResultInfo("司机信息为空，请联系管理员");
+            ApiUser apiUserByOpenId = apiUserService.findApiUserByOpenId(record.getOpenId());
+            if (apiUserByOpenId == null){
+                return ResultInfo.newFailResultInfo("用户不存在");
             }
+            int driverId = apiUserByOpenId.getDriverId();
+            if (driverId == 0){
+                return ResultInfo.newFailResultInfo("当前微信号没有绑定司机信息，请联系管理员！");
+            }
+            Driver driver = driverService.findDriverById(driverId);
+            if (driver == null){
+                return ResultInfo.newFailResultInfo("司机信息不存在，请联系管理员");
+            }
+            record.setDriverId(driver.getId());
             if (record.getId() == 0){
+                TurnoverRecord turnoverRecord = turnoverService.findTurnoverRecord(record.getReportDate(), record.getDriverId());
+                if (turnoverRecord != null){
+                    return ResultInfo.newFailResultInfo("当日已存在上报记录，请联系管理员");
+                }
                 record.setCreateTime(new Date());
                 String initFlag = turnoverService.initRecord(record,driver);
                 if (!CommonConstant.SUCCESS.equals(initFlag)){

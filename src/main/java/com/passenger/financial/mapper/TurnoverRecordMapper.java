@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface TurnoverRecordMapper {
 
-    TurnoverRecord findRecordByDateAndPhone(@Param("currentDate") String currentDate, @Param("phone") String phone);
+    TurnoverRecord findRecordByDateAndDriverId(@Param("currentDate") String currentDate, @Param("driverId") int driverId);
 
     void insert(TurnoverRecord record);
 

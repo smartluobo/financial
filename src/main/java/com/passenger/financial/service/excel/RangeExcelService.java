@@ -1,18 +1,19 @@
 package com.passenger.financial.service.excel;
 
+import com.passenger.financial.common.CommonConstant;
 import com.passenger.financial.entity.Driver;
 import com.passenger.financial.entity.StatisticalInfo;
 import com.passenger.financial.entity.TurnoverRecord;
 import com.passenger.financial.mapper.DriverMapper;
+import com.passenger.financial.mapper.StatisticalRecordMapper;
 import com.passenger.financial.mapper.TurnoverRecordMapper;
+import com.passenger.financial.utils.CalculateUtil;
 import com.passenger.financial.utils.DateUtils;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
+@Service
 public class RangeExcelService {
 
     @Resource
@@ -28,6 +30,9 @@ public class RangeExcelService {
 
     @Resource
     private TurnoverRecordMapper turnoverRecordMapper;
+
+    @Resource
+    private StatisticalRecordMapper statisticalRecordMapper;
 
     public HSSFWorkbook generateRangeExcel(String startTime,String endTime,int organizationId) throws Exception{
 
@@ -52,9 +57,6 @@ public class RangeExcelService {
         headStyle.setFont(headFont);
 
 
-
-
-
         //合并第一行显示
         CellRangeAddress statisticalTile = new CellRangeAddress(0, 0, 0, titles.length);
         sheet.addMergedRegion(statisticalTile);
@@ -72,6 +74,8 @@ public class RangeExcelService {
 
         //构建excel体
 
+        String globalShouldAmount = "0";
+
         List<Integer> driverIds  = driverMapper.findIdByAccountId(organizationId);
         if (CollectionUtils.isEmpty(driverIds)){
 
@@ -84,15 +88,69 @@ public class RangeExcelService {
                     //分配总额
                     String distributionTotal = "0";
                     //上班天数 记录
+                    String workDay = "0";
                     //个人收入 金额
+                    String totalProfits = "0";
                     //个人应收 金额
+                    String totalShouldIncome = "0";
                     //进 金额
+                    String totalIn = "0";
                     //补 金额
+                    String totalOut = "0";
                     for (TurnoverRecord record : records) {
-                        bodyRow.createCell(cellIndex++).setCellValue(record.getProfits());
+                        if (record.getType() == CommonConstant.LEAVE){
+                            bodyRow.createCell(cellIndex++).setCellValue("请假");
+                        }else{
+                            bodyRow.createCell(cellIndex++).setCellValue(record.getProfits());
+                        }
+                        distributionTotal = CalculateUtil.add(distributionTotal,record.getDistributionAmount());
+                        workDay = CalculateUtil.add(workDay,record.getWorkTimeValue());
+                        totalProfits = CalculateUtil.add(totalProfits,record.getProfits());
+                        totalShouldIncome = CalculateUtil.add(totalShouldIncome,record.getShouldAmount());
                     }
+                    if (Double.parseDouble(totalProfits) > Double.parseDouble(totalShouldIncome)){
+                        //个人实际收入大于应该收入
+                        totalOut = CalculateUtil.sub(totalProfits,totalShouldIncome);
+                    }else{
+                        totalIn = CalculateUtil.sub(totalShouldIncome,totalProfits);
+                    }
+                    //分配总额
+                    bodyRow.createCell(cellIndex++).setCellValue(distributionTotal);
+                    //上班天数 记录
+                    bodyRow.createCell(cellIndex++).setCellValue(workDay);
+                    //个人收入 金额
+                    bodyRow.createCell(cellIndex++).setCellValue(totalProfits);
+                    //个人应收 金额
+                    bodyRow.createCell(cellIndex++).setCellValue(totalShouldIncome);
+                    //进 金额
+                    bodyRow.createCell(cellIndex++).setCellValue(totalIn);
+                    //补 金额
+                    bodyRow.createCell(cellIndex++).setCellValue(totalOut);
+                    globalShouldAmount = CalculateUtil.add(globalShouldAmount,totalShouldIncome);
                 }
             }
+            List<StatisticalInfo> statisticalInfos =  statisticalRecordMapper.findStatisticalRecordByRange(startTime,endTime,organizationId);
+
+            String globalProfits = "0";
+            int summaryIndex = 0;
+            //总收入一栏
+            HSSFRow totalProfitsRow = sheet.createRow(rowIndex++);
+            totalProfitsRow.createCell(0).setCellValue("总收入");
+            //参营车辆一栏
+            HSSFRow totalOperation = sheet.createRow(rowIndex++);
+            totalOperation.createCell(0).setCellValue("参营车辆");
+            //每日分配一栏
+            HSSFRow totalDistribution = sheet.createRow(rowIndex++);
+            totalDistribution.createCell(0).setCellValue("每日分配");
+            for (StatisticalInfo statisticalInfo : statisticalInfos) {
+                summaryIndex++;
+                totalProfitsRow.createCell(summaryIndex).setCellValue(statisticalInfo.getTotalProfits());
+                totalOperation.createCell(summaryIndex).setCellValue(statisticalInfo.getOperationCount());
+                totalDistribution.createCell(summaryIndex).setCellValue(statisticalInfo.getDistributionAmount());
+                globalProfits = CalculateUtil.add(globalProfits,statisticalInfo.getTotalProfits());
+            }
+            totalProfitsRow.createCell(++summaryIndex).setCellValue(globalShouldAmount);
+            totalProfitsRow.createCell(++summaryIndex).setCellValue(globalProfits);
         }
 
 

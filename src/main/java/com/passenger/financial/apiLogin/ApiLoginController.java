@@ -40,7 +40,7 @@ public class ApiLoginController {
             if (StringUtils.isEmpty(code)){
                 return ResultInfo.newEmptyResultInfo();
             }
-            ResultInfo resultInfo = ResultInfo.newSuccessResultInfo();
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
             String oppenId = apiLoginService.login(code);
             log.error("***************oppenId : {}",oppenId);
             if (!StringUtils.isEmpty(oppenId)){
@@ -48,7 +48,7 @@ public class ApiLoginController {
                 resultInfo.setData(oppenId);
                 return resultInfo;
             }
-            return ResultInfo.newFailResultInfo();
+            return resultInfo;
         }catch (Exception e){
             log.error("login happen exception code : {}",code,e);
             return ResultInfo.newExceptionResultInfo();
@@ -66,7 +66,7 @@ public class ApiLoginController {
         String userHeadImage = params.get("userHeadImage");
         log.info("reportApiUserInfo current user oppenId : {}, nickName: {},userHeadImage : {}",oppenId,nickName,userHeadImage);
         try {
-            ResultInfo resultInfo = ResultInfo.newSuccessResultInfo();
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
             ApiUser apiuser = apiUserService.findApiUserByOpenId(oppenId);
             if (apiuser == null){
                 return ResultInfo.newFailResultInfo("用户不存在，请先授权登陆");
@@ -78,6 +78,21 @@ public class ApiLoginController {
             return resultInfo;
         }catch (Exception e){
             log.error("calculateGoodsOrderPrice GoodsOrderParamVo : {}",params,e);
+            return ResultInfo.newExceptionResultInfo();
+        }
+    }
+
+
+    @RequestMapping("/initDriver")
+    public ResultInfo initDriver(){
+
+
+        try {
+            ResultInfo resultInfo = ResultInfo.newCmsSuccessResultInfo();
+            apiUserService.initDriver();
+            return resultInfo;
+        }catch (Exception e){
+            log.error("initDriver happen exception : {}",e);
             return ResultInfo.newExceptionResultInfo();
         }
     }

@@ -36,8 +36,8 @@ public class TurnoverService {
     @Resource
     private ApiUserService apiUserService;
 
-    public TurnoverRecord findTurnoverRecord(String currentDate, String phone) {
-        return turnoverRecordMapper.findRecordByDateAndPhone(currentDate,phone);
+    public TurnoverRecord findTurnoverRecord(String currentDate, int driverId) {
+        return turnoverRecordMapper.findRecordByDateAndDriverId(currentDate,driverId);
     }
 
     public String checkRecord(TurnoverRecord record) {
@@ -57,7 +57,7 @@ public class TurnoverService {
             return "司机唯一表示错误，请联系管理员";
         }
         ApiUser apiUser = apiUserService.findApiUserByOpenId(record.getOpenId());
-        if (apiUser == null || StringUtils.isEmpty(apiUser.getPhoneNum())){
+        if (apiUser == null || apiUser.getDriverId() == 0){
             return "当前用户不存在或未绑定司机信息，请联系管理员";
         }
         return CommonConstant.SUCCESS;

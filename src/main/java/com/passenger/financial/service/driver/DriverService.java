@@ -16,10 +16,13 @@ public class DriverService {
 
     @Resource
     private DriverMapper driverMapper;
+
     public Driver findDriverByPhone(String phone){
-
         return driverMapper.findDriverByPhone(phone);
+    }
 
+    public Driver findDriverById(int driverId){
+        return driverMapper.findById(driverId);
     }
 
     public List<Driver> findDriverByCondition(Map<String, String> params) {

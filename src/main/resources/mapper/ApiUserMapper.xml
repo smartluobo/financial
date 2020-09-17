@@ -3,34 +3,36 @@
 <mapper namespace="com.passenger.financial.mapper.ApiUserMapper">
     <resultMap id="BaseResultMap" type="com.passenger.financial.entity.ApiUser">
         <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
-        <result column="wechat_num" jdbcType="VARCHAR" property="wechatNum"/>
-        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
-        <result column="phone_num" jdbcType="VARCHAR" property="phoneNum"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-        <result column="user_head_image" jdbcType="VARCHAR" property="userHeadImage"/>
+        <result column="nick_name"  property="nickName"/>
+        <result column="driver_name"  property="driverName"/>
+        <result column="open_id"  property="openId"/>
+        <result column="driver_id"  property="driverId"/>
+        <result column="organization_id"  property="organizationId"/>
+        <result column="organization_name"  property="organizationName"/>
+        <result column="accounting_organization_id"  property="accountingOrganizationId"/>
+        <result column="accounting_organization_name"  property="accountingOrganizationName"/>
+        <result column="wechat_num"  property="wechatNum"/>
+        <result column="phone_num"  property="phoneNum"/>
+        <result column="user_head_image"  property="userHeadImage"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="update_time"  property="updateTime"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        id, nick_name, wechat_num, open_id, phone_num, create_time, update_time, user_head_image
-    </sql>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_api_user where id = #{id,jdbcType=INTEGER}
+        select * from tb_api_user where id = #{id}
     </select>
 
     <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="string">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM tb_api_user WHERE open_id = #{openId}
+        SELECT * FROM tb_api_user WHERE open_id = #{openId}
+    </select>
+
+    <select id="findNoInitDriverInfoUser" resultMap="BaseResultMap">
+        select * from tb_api_user where driver_name is null and driver_id is not null
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        delete
-        from tb_api_user
-        where id = #{id,jdbcType=INTEGER}
+        delete from tb_api_user where id = #{id}
     </delete>
 
     <insert id="insert" parameterType="com.passenger.financial.entity.ApiUser">
@@ -48,6 +50,17 @@
             update_time     = #{updateTime},
             user_head_image = #{userHeadImage}
         where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateDriverInfoById" parameterType="com.passenger.financial.entity.ApiUser">
+        update tb_api_user
+        set driver_name       = #{driverName},
+            organization_id      = #{organizationId},
+            organization_name         = #{organizationName},
+            accounting_organization_id       = #{accountingOrganizationId},
+            accounting_organization_name     = #{accountingOrganizationName},
+            update_time = #{updateTime}
+        where id = #{id}
     </update>
 
 </mapper>

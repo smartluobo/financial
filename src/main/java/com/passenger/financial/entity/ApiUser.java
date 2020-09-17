@@ -16,6 +16,8 @@ public class ApiUser {
 
     private String openId;
 
+    private int driverId;
+
     /**
      * 电话号码
      */
@@ -39,7 +41,7 @@ public class ApiUser {
     /**
      * 直接组织id
      */
-    private String organizationId;
+    private int organizationId;
 
     /**
      * 直接组织名称

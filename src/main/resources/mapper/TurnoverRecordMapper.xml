@@ -59,8 +59,8 @@
     </update>
 
 
-    <select id="findRecordByDateAndPhone" resultMap="BaseResultMap" parameterType="map">
-    select * from tb_turnover_record where phone = #{phone} and report_date = #{currentDate}
+    <select id="findRecordByDateAndDriverId" resultMap="BaseResultMap" parameterType="map">
+    select * from tb_turnover_record where driver_id = #{driverId} and report_date = #{currentDate}
   </select>
     <select id="findAllRecordByDateAndAccountId" resultMap="BaseResultMap" parameterType="map">
         select * from tb_turnover_record where accounting_organization_id = #{accountingId} and report_date = #{currentDate}
