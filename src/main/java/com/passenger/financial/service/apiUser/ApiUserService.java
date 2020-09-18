@@ -57,4 +57,8 @@ public class ApiUserService {
             }
         }
     }
+
+    public ApiUser findApiUserByPhone(String phone) {
+        return apiUserMapper.findApiUserByPhone(phone);
+    }
 }

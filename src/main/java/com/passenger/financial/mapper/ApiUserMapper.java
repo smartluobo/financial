@@ -21,4 +21,6 @@ public interface ApiUserMapper {
 
     List<ApiUser> findNoInitDriverInfoUser();
 
+    ApiUser findApiUserByPhone(String phone);
+
 }

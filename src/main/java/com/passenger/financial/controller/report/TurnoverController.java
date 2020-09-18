@@ -41,6 +41,11 @@ public class TurnoverController {
     @Resource
     private StatisticalService statisticalService;
 
+    /**
+     * 代理提交，使用电话号码查询当日记录
+     * @param params
+     * @return
+     */
     @RequestMapping("/getInfo")
     public ResultInfo getInfo(@RequestBody Map<String,String> params){
         if (CollectionUtils.isEmpty(params)){
@@ -48,19 +53,19 @@ public class TurnoverController {
         }
 
         String currentDate = params.get("currentDate");
-        String openId = params.get("openId");
-        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(openId)){
+        String phone = params.get("phone");
+        if (StringUtils.isEmpty(currentDate) || StringUtils.isEmpty(phone)){
             return ResultInfo.newEmptyParamsResultInfo();
         }
 
         try {
-            ApiUser apiUserByOpenId = apiUserService.findApiUserByOpenId(openId);
+            ApiUser apiUserByOpenId = apiUserService.findApiUserByPhone(phone);
             if (apiUserByOpenId == null){
                 return ResultInfo.newFailResultInfo("用户不存在");
             }
             int driverId = apiUserByOpenId.getDriverId();
             if (driverId == 0){
-                return ResultInfo.newFailResultInfo("当前微信号没有绑定司机信息，请联系管理员！");
+                return ResultInfo.newFailResultInfo("当前电话号码没有绑定司机信息，请联系管理员！");
             }
             Driver driver = driverService.findDriverById(driverId);
             if (driver == null){
@@ -99,13 +104,13 @@ public class TurnoverController {
                 return ResultInfo.newFailResultInfo(flag);
             }
 
-            ApiUser apiUserByOpenId = apiUserService.findApiUserByOpenId(record.getOpenId());
+            ApiUser apiUserByOpenId = apiUserService.findApiUserByPhone(record.getPhone());
             if (apiUserByOpenId == null){
                 return ResultInfo.newFailResultInfo("用户不存在");
             }
             int driverId = apiUserByOpenId.getDriverId();
             if (driverId == 0){
-                return ResultInfo.newFailResultInfo("当前微信号没有绑定司机信息，请联系管理员！");
+                return ResultInfo.newFailResultInfo("当前电话号码没有绑定司机信息，请联系管理员！");
             }
             Driver driver = driverService.findDriverById(driverId);
             if (driver == null){
