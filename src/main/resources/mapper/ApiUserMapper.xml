@@ -16,6 +16,7 @@
         <result column="user_head_image"  property="userHeadImage"/>
         <result column="create_time"  property="createTime"/>
         <result column="update_time"  property="updateTime"/>
+        <result column="proxy_permission"  property="proxyPermission"/>
     </resultMap>
 
 
@@ -32,7 +33,7 @@
     </select>
 
     <select id="findApiUserByPhone" resultMap="BaseResultMap">
-        select * from tb_api_user where phone = #{phone}
+        select * from tb_api_user where phone_num = #{phone}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">

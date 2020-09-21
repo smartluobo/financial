@@ -57,4 +57,7 @@ public class ApiUser {
      */
     private String accountingOrganizationName;
 
+    private int proxyPermission;
+
+
 }
