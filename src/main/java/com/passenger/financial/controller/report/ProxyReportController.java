@@ -100,6 +100,14 @@ public class ProxyReportController {
             return ResultInfo.newEmptyParamsResultInfo();
         }
         log.info("record : {}",record);
+        //查询当前人是否有代理提交权限
+        if (StringUtils.isEmpty(record.getOpenId())){
+            return ResultInfo.newFailResultInfo("用户未登录，请先登录");
+        }
+        ApiUser proxyUser = apiUserService.findApiUserByOpenId(record.getOpenId());
+        if (proxyUser == null || proxyUser.getProxyPermission() == 0){
+            return ResultInfo.newFailResultInfo("当前用户没有代理提交权限");
+        }
         //查询当日是否有统计记录，如果有统计记录不允许再提交数据
         StatisticalInfo statisticalInfo = statisticalService.findStatisticalRecordByDate(record.getReportDate(),record.getAccountingOrganizationId());
         if (statisticalInfo != null){
@@ -111,14 +119,15 @@ public class ProxyReportController {
                 return ResultInfo.newFailResultInfo(flag);
             }
 
-            ApiUser apiUserByOpenId = apiUserService.findApiUserByPhone(record.getPhone());
-            if (apiUserByOpenId == null){
+            ApiUser apiUser = apiUserService.findApiUserByPhone(record.getPhone());
+            if (apiUser == null){
                 return ResultInfo.newFailResultInfo("用户不存在");
             }
-            int driverId = apiUserByOpenId.getDriverId();
+            int driverId = apiUser.getDriverId();
             if (driverId == 0){
                 return ResultInfo.newFailResultInfo("当前电话号码没有绑定司机信息，请联系管理员！");
             }
+            record.setOpenId(apiUser.getOpenId());
             Driver driver = driverService.findDriverById(driverId);
             if (driver == null){
                 return ResultInfo.newFailResultInfo("司机信息不存在，请联系管理员");
